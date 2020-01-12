@@ -2,17 +2,17 @@
 
 FROM centos
 
-ENV BRANCH=master
+#ENV BRANCH=master
 ENV MAVEN_PROJECTS_LIST="!:kylo-catalog-filesystem-azure,!:kylo-install-rpm,!:kylo-install-debian,!:example-auth-custom,!:example-ui-get-file-processor-template,!:example-ui-feed-stepper-plugin,!:example-module-services,!:example-module-ui,!:kylo-provenance-samples,!:kylo-spark-provenance-app,!:kylo-release"
 
-#ENV BRANCH=v0.9.1.1
+ENV BRANCH=v0.10.1
 #ENV MAVEN_PROJECTS_LIST="!:kylo-install-rpm,!:kylo-install-debian,!:example-auth-custom,!:example-ui-get-file-processor-template,!:example-ui-feed-stepper-plugin,!:example-module-services,!:example-module-ui,!:kylo-provenance-samples,!:kylo-spark-provenance-app,!:kylo-release"
 
 # Install required packages
-RUN yum install -yy wget git which java-1.8.0-openjdk-devel bzip2 rpm-build
+RUN yum install -yy wget git which java-1.8.0-openjdk-devel bzip2 rpm-build epel-release
 
 # Install NodeJS and Yarn
-RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash - && yum install nodejs -yy
+RUN yum install nodejs npm -yy
 RUN curl -sL https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && yum install yarn -yy
 
 # Install wkhtmltopdf (https://gist.github.com/paulsturgess/cfe1a59c7c03f1504c879d45787699f5)
@@ -25,10 +25,10 @@ RUN mkdir -p /usr/local/src && cd /usr/local/src && wget http://apache.crihan.fr
 RUN cd /usr/local/src && tar -xf apache-maven-3.5.4-bin.tar.gz && rm -f apache-maven-3.5.4-bin.tar.gz && mv apache-maven-3.5.4/ apache-maven/
 
 # Checkout kylo
-RUN mkdir -p /usr/local/src/ && cd /usr/local/src/ && git clone --branch $BRANCH https://github.com/Teradata/kylo.git
+#RUN mkdir -p /usr/local/src/ && cd /usr/local/src/ && git clone --branch $BRANCH https://github.com/Teradata/kylo.git
 
 # Compile 
-RUN cd /usr/local/src/kylo/ && /usr/local/src/apache-maven/bin/mvn package -B -pl "$MAVEN_PROJECTS_LIST" -DskipTests=true -Dlicense.skipCheckLicense=true -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+#RUN cd /usr/local/src/kylo/ && /usr/local/src/apache-maven/bin/mvn package -B -pl "$MAVEN_PROJECTS_LIST" -DskipTests=true -Dlicense.skipCheckLicense=true -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 
 ##################### INSTALL KYLO #####################
@@ -36,7 +36,8 @@ RUN cd /usr/local/src/kylo/ && /usr/local/src/apache-maven/bin/mvn package -B -p
 RUN yum install -yy curl sudo unzip mariadb
 
 # Copy kylo TAR
-RUN mkdir -p /opt/kylo && mv /usr/local/src/kylo/install/install-tar/target/kylo-*-dependencies.tar.gz /opt/kylo/
+RUN mkdir -p /opt/kylo
+COPY kylo-*-dependencies.tar.gz /opt/kylo
 
 # Cleanup
 RUN rm -rf /toot/.m2 /usr/local/src/apache-maven /usr/local/src/apache-maven /usr/local/src/kylo
@@ -61,7 +62,7 @@ RUN cp /opt/kylo/setup/plugins/kylo-service-monitor-kylo-cluster-*.jar /opt/kylo
 
 # Install spark
 RUN mkdir -p /opt/spark
-RUN wget http://apache.crihan.fr/dist/spark/spark-2.3.1/spark-2.3.1-bin-hadoop2.7.tgz
+RUN wget http://archive.apache.org/dist/spark/spark-2.3.1/spark-2.3.1-bin-hadoop2.7.tgz
 RUN tar zxvf spark-2.3.1-bin-hadoop2.7.tgz -C /opt/spark && rm -f spark-2.3.1-bin-hadoop2.7.tgz
 RUN ln -s /opt/spark/spark-2.3.1-bin-hadoop2.7 /opt/spark/current
 

@@ -6,6 +6,14 @@ services:
     image: 127.0.0.1:5000/kylo-master
     build: ./build/kylo-master
     entrypoint: /entrypoint-kylo-services.sh
+    ports:
+     - 8420:8420
+#    depends_on:
+#      - db
+#      - nifi
+#      - es
+#      - jms
+#      - reverse-proxy
     networks:
       - frontoffice
       - backoffice
@@ -22,10 +30,18 @@ services:
       - ./volumes/commons/lib-ext/sqljdbc42.jar:/opt/kylo/kylo-services/lib/sqljdbc42.jar
       - ./volumes/commons/lib-ext/ifxjdbc-4.10.10.0.jar:/opt/kylo/kylo-services/lib/ifxjdbc-4.10.10.0.jar
       - ./volumes/services/core-site.xml:/etc/hadoop/conf/core-site.xml
+    environment:
+      VIRTUAL_HOST: services.sandbox.kylo.io
+      VIRTUAL_PORT: 8420
 
   ui:
     image: 127.0.0.1:5000/kylo-master
     entrypoint: /entrypoint-kylo-ui.sh
+    ports:
+      - 8400:8400
+    depends_on:
+      - services
+      - reverse-proxy
     networks:
       - frontoffice
       - backoffice
@@ -41,6 +57,10 @@ services:
   nifi:
     image: 127.0.0.1:5000/kylo-master
     entrypoint: /entrypoint-kylo-nifi.sh
+    depends_on:
+      - reverse-proxy
+    ports:
+      - 8079:8079
     volumes:
       - ./volumes/nifi/config.properties:/opt/nifi/ext-config/config.properties
       - ./volumes/commons/lib-ext/sqljdbc42.jar:/opt/nifi/current/lib/sqljdbc42.jar
@@ -49,10 +69,7 @@ services:
       - frontoffice
       - backoffice
       - reverse-proxy
-    environment:
-      VIRTUAL_HOST: nifi.sandbox.kylo.io
-      VIRTUAL_PORT: 8079
-      
+
   db:
     image: mariadb
     environment:
@@ -84,16 +101,16 @@ services:
     networks:
       - backoffice
       
-  #init-templates:
-  #  image: 127.0.0.1:5000/kylo-master
-  #  depends_on:
-  #    - ui
-  #  deploy:
-  #    restart_policy:
-  #      condition: none
-  #  command: "/opt/wait-for-it/wait-for-it.sh -h ui -p 8400 --strict --timeout=0 -- /opt/kylo/setup/data/install-templates.sh ui 8400"
-  #  networks:
-  #    - backoffice
+  init-templates:
+    image: 127.0.0.1:5000/kylo-master
+    depends_on:
+      - ui
+    deploy:
+      restart_policy:
+        condition: none
+    command: "/opt/wait-for-it/wait-for-it.sh -h ui -p 8400 --strict --timeout=0 -- /opt/kylo/setup/data/install-templates.sh ui 8400"
+    networks:
+      - backoffice
   
   hdp-sandbox:
     image: hortonworks/sandbox-hdp:2.6.5
@@ -118,7 +135,7 @@ services:
     networks:
       - reverse-proxy
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:r
+      - /var/run/docker.sock:/tmp/docker.sock:ro
 
   registry:
     image: registry
