@@ -48,11 +48,11 @@ RUN cd /opt/kylo/ && tar zxvf kylo-*-dependencies.tar.gz && rm -f kylo-*-depende
 RUN /opt/kylo/setup/install/post-install.sh
 
 # Create additional shells required for Docker
-RUN sed -E 's/(^java .*) > .+/\1/' /opt/kylo/kylo-ui/bin/run-kylo-ui.sh > /opt/kylo/kylo-ui/bin/run-kylo-ui-interactive.sh && chmod +x /opt/kylo/kylo-ui/bin/run-kylo-ui-interactive.sh
+RUN sed -E -e 's/(^java .*) > .+/\1/' -e 's/\/opt\/java\/current/\/usr\/lib\/jvm\/java-1.8.0/' /opt/kylo/kylo-ui/bin/run-kylo-ui.sh > /opt/kylo/kylo-ui/bin/run-kylo-ui-interactive.sh && chmod +x /opt/kylo/kylo-ui/bin/run-kylo-ui-interactive.sh
 RUN sed -i 's/file/console/g' /opt/kylo/kylo-ui/conf/log4j.properties && sed -i 's/DailyRollingFileAppender/ConsoleAppender/g' /opt/kylo/kylo-ui/conf/log4j.properties
 RUN sed 's/localhost:8400/$1:$2/g' /opt/kylo/setup/data/install-templates-locally.sh > /opt/kylo/setup/data/install-templates.sh && chmod +x /opt/kylo/setup/data/install-templates.sh
 
-RUN sed -E 's/(^java .*) > .+/\1/' /opt/kylo/kylo-services/bin/run-kylo-services.sh > /opt/kylo/kylo-services/bin/run-kylo-services-interactive.sh && chmod +x /opt/kylo/kylo-services/bin/run-kylo-services-interactive.sh
+RUN sed -E -e 's/(^java .*) > .+/\1/' -e 's/\/opt\/java\/current/\/usr\/lib\/jvm\/java-1.8.0/' /opt/kylo/kylo-services/bin/run-kylo-services.sh > /opt/kylo/kylo-services/bin/run-kylo-services-interactive.sh && chmod +x /opt/kylo/kylo-services/bin/run-kylo-services-interactive.sh
 RUN sed -i 's/file/console/g' /opt/kylo/kylo-services/conf/log4j.properties && sed -i 's/DailyRollingFileAppender/ConsoleAppender/g' /opt/kylo/kylo-services/conf/log4j.properties
 
 # Enable plugins
