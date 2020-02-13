@@ -72,6 +72,12 @@ RUN /opt/kylo/setup/nifi/install-nifi.sh 1.6.0 /opt/nifi nifi nifi
 RUN sed -i 's/SPARK_SUBMIT=.*/SPARK_SUBMIT=\/opt\/spark\/current\/bin\/spark-submit/' /opt/kylo/setup/nifi/create-symbolic-links.sh
 RUN /opt/kylo/setup/nifi/install-kylo-components.sh /opt/nifi /opt/kylo/ nifi nifi
 
+# Add Hadoop & AWS jars for spark
+ARG AWS_SDK_VERSION="1.7.4"
+ARG AWS_HADOOP_VERSION="2.7.4"
+RUN curl https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk/${AWS_SDK_VERSION}/aws-java-sdk-${AWS_SDK_VERSION}.jar -o /opt/spark/current/jars/aws-java-sdk-${AWS_SDK_VERSION}.jar && \
+    curl https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/${AWS_HADOOP_VERSION}/hadoop-aws-${AWS_HADOOP_VERSION}.jar -o /opt/spark/current/jars/hadoop-aws-${AWS_HADOOP_VERSION}.jar
+
 # Install wait-for-it util
 RUN cd /opt && git clone https://github.com/vishnubob/wait-for-it.git && ln -s /opt/wait-for-it/wait-for-it.sh /usr/sbin
 
