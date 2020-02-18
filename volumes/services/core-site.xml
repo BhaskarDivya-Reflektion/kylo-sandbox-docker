@@ -7,7 +7,7 @@
     
     <property>
       <name>fs.defaultFS</name>
-      <value>hdfs://sandbox-hdp.hortonworks.com:8020</value>
+      <value>hdfs://hdp-sandbox:8020</value>
       <final>true</final>
     </property>
     
@@ -78,7 +78,7 @@
     
     <property>
       <name>hadoop.proxyuser.hcat.hosts</name>
-      <value>sandbox-hdp.hortonworks.com</value>
+      <value>hdp-sandbox</value>
     </property>
     
     <property>
@@ -98,7 +98,7 @@
     
     <property>
       <name>hadoop.proxyuser.hive.hosts</name>
-      <value>sandbox-hdp.hortonworks.com</value>
+      <value>hdp-sandbox</value>
     </property>
     
     <property>
@@ -128,7 +128,7 @@
     
     <property>
       <name>hadoop.proxyuser.oozie.hosts</name>
-      <value>sandbox-hdp.hortonworks.com</value>
+      <value>hdp-sandbox</value>
     </property>
     
     <property>
@@ -138,7 +138,7 @@
     
     <property>
       <name>hadoop.proxyuser.root.hosts</name>
-      <value>sandbox-hdp.hortonworks.com</value>
+      <value>hdp-sandbox</value>
     </property>
     
     <property>
