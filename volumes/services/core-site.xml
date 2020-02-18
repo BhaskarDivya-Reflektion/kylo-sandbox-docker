@@ -7,7 +7,7 @@
     
     <property>
       <name>fs.defaultFS</name>
-      <value>hdfs://hdp-sandbox:8020</value>
+      <value>hdfs://sandbox-hdp.hortonworks.com:8020</value>
       <final>true</final>
     </property>
     
